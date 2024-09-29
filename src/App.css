@@ -1,0 +1,10 @@
+.App {
+  padding-top: 20px;
+}
+
+.preview-container {
+  white-space: pre-wrap;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  color: #37474f;
+}
