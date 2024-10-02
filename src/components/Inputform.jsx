@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './inputform.css'; // Import the CSS file
 import AuthorInput from './AuthorInput';
 import TableInput from './TableInput';
 import ImageUpload from './ImageUpload';
@@ -13,6 +14,7 @@ const InputForm = ({ onSubmit }) => {
   const [images, setImages] = useState([]);
   const [sectionHeading, setSectionHeading] = useState('');
   const [sectionContent, setSectionContent] = useState('');
+  const [currentSection, setCurrentSection] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,73 +32,149 @@ const InputForm = ({ onSubmit }) => {
 
   const addSection = () => {
     if (sectionHeading && sectionContent) {
-      setSections([...sections, { heading: sectionHeading, content: sectionContent }]);
+      setSections([...sections, { heading: sectionHeading, content: sectionContent, subsections: [] }]);
       setSectionHeading('');
       setSectionContent('');
     }
   };
 
+  const addSubsection = () => {
+    if (currentSection && sectionHeading && sectionContent) {
+      setSections(prevSections =>
+        prevSections.map(section =>
+          section.heading === currentSection
+            ? {
+                ...section,
+                subsections: [
+                  ...(section.subsections || []),
+                  { heading: sectionHeading, content: sectionContent },
+                ],
+              }
+            : section
+        )
+      );
+      setSectionHeading('');
+      setSectionContent('');
+    }
+  };
+
+  const handleTextareaResize = (e) => {
+    const textarea = e.target;
+    textarea.style.height = 'auto'; // Reset height
+    textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on scroll height
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="container">
-      <div className="form-group">
-        <label>Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="form-control"
-          required
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="formContainer">
+      <label className="label">Title</label>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="input"
+        required
+      />
+
       <AuthorInput authors={authors} setAuthors={setAuthors} />
-      <div className="form-group">
-        <label>Abstract</label>
-        <textarea
-          value={abstract}
-          onChange={(e) => setAbstract(e.target.value)}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Keywords (comma-separated)</label>
-        <input
-          type="text"
-          value={keywords}
-          onChange={(e) => setKeywords(e.target.value)}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label>Sections</label>
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Section Heading"
-            value={sectionHeading}
-            onChange={(e) => setSectionHeading(e.target.value)}
-            className="form-control"
-          />
-          <input
-            type="text"
-            placeholder="Section Content"
-            value={sectionContent}
-            onChange={(e) => setSectionContent(e.target.value)}
-            className="form-control"
-          />
-          <button type="button" className="btn btn-primary" onClick={addSection}>
-            Add Section
-          </button>
+
+      <label className="label">Abstract</label>
+      <textarea
+        value={abstract}
+        onChange={(e) => {
+          setAbstract(e.target.value);
+          handleTextareaResize(e);
+        }}
+        className="textarea"
+        required
+        rows={3}
+      />
+
+      <label className="label">Keywords (comma-separated)</label>
+      <input
+        type="text"
+        value={keywords}
+        onChange={(e) => setKeywords(e.target.value)}
+        className="input"
+      />
+
+      <label className="label">Sections</label>
+      <input
+        type="text"
+        placeholder="Section Heading"
+        value={sectionHeading}
+        onChange={(e) => setSectionHeading(e.target.value)}
+        className="input"
+      />
+      <textarea
+        placeholder="Section Content"
+        value={sectionContent}
+        onChange={(e) => {
+          setSectionContent(e.target.value);
+          handleTextareaResize(e);
+        }}
+        className="textarea"
+        rows={3}
+      />
+      <button type="button" onClick={addSection} className="button">
+        Add Section
+      </button>
+
+      <ul className="sectionList">
+        {sections.map((section, index) => (
+          <li key={index} className="sectionItem">
+            <strong>{section.heading}:</strong> {section.content}
+          </li>
+        ))}
+      </ul>
+
+      <label className="label">Add Subsections to Section:</label>
+      <select onChange={(e) => setCurrentSection(e.target.value)} className="input">
+        <option value="">Select Section</option>
+        {sections.map((section, index) => (
+          <option key={index} value={section.heading}>
+            {section.heading}
+          </option>
+        ))}
+      </select>
+
+      <input
+        type="text"
+        placeholder="Subsection Heading"
+        value={sectionHeading}
+        onChange={(e) => setSectionHeading(e.target.value)}
+        className="input"
+      />
+      <textarea
+        placeholder="Subsection Content"
+        value={sectionContent}
+        onChange={(e) => {
+          setSectionContent(e.target.value);
+          handleTextareaResize(e);
+        }}
+        className="textarea"
+        rows={3}
+      />
+      <button type="button" onClick={addSubsection} className="button">
+        Add Subsection
+      </button>
+
+      {currentSection && (
+        <div>
+          <h4>{currentSection} Subsections:</h4>
+          <ul className="subsectionList">
+            {sections.find(section => section.heading === currentSection)?.subsections.map((subsection, index) => (
+              <li key={index}>
+                <strong>{subsection.heading}:</strong> {subsection.content}
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul>
-          {sections.map((section, index) => (
-            <li key={index}><strong>{section.heading}:</strong> {section.content}</li>
-          ))}
-        </ul>
-      </div>
+      )}
+
       <TableInput tables={tables} setTables={setTables} />
       <ImageUpload images={images} setImages={setImages} />
-      <button type="submit" className="btn btn-success">Generate LaTeX</button>
+
+      <button type="submit" className="button">Generate LaTeX</button>
     </form>
   );
 };

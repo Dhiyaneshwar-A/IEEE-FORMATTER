@@ -14,9 +14,9 @@ function App() {
 
   return (
     <div className="App">
-      <h1>IEEE Formatter</h1>
+      <h1 className="text-center">IEEE Formatter</h1>
       <InputForm onSubmit={handleFormSubmit} />
-      <h2>LaTeX Preview</h2>
+      <h2 className="text-center">LaTeX Preview</h2>
       <Preview latexCode={latexCode} />
     </div>
   );
