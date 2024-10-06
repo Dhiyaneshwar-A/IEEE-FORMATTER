@@ -174,7 +174,11 @@ const InputForm = ({ onSubmit }) => {
       <TableInput tables={tables} setTables={setTables} />
       <ImageUpload images={images} setImages={setImages} />
 
-      <button type="submit" className="button">Generate LaTeX</button>
+    <div className="col text-center">
+    <button type="submit" className="btn btn-primary">
+      SUBMIT PAPER
+    </button>
+  </div>
     </form>
   );
 };

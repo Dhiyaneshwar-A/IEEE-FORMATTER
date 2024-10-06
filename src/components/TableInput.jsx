@@ -4,7 +4,6 @@ const TableInput = ({ tables, setTables }) => {
   const [columns, setColumns] = useState(['']);
   const [rows, setRows] = useState([]);
   const [newRowValues, setNewRowValues] = useState({});
-  const [caption, setCaption] = useState(''); // New state for table caption
 
   const handleAddColumn = () => {
     setColumns([...columns, '']);
@@ -32,27 +31,14 @@ const TableInput = ({ tables, setTables }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setTables([...tables, { caption, columns, rows }]); // Include caption when adding table
+    setTables([...tables, { columns, rows }]); // Add current table to the list
     setColumns(['']); // Reset columns for new table input
     setRows([]); // Reset rows for new table input
-    setCaption(''); // Reset caption for new table input
   };
 
   return (
     <div className="mb-4">
       <h4>Table Input</h4>
-
-      <div>
-        <h5>Table Caption</h5>
-        <input
-          type="text"
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          placeholder="Enter table caption"
-          className="form-control mb-3"
-        />
-      </div>
-
       <div>
         <h5>Columns</h5>
         {columns.map((col, index) => (
@@ -89,7 +75,6 @@ const TableInput = ({ tables, setTables }) => {
         <h5>Current Table Preview</h5>
         {rows.length > 0 && (
           <table className="table table-bordered">
-            <caption>{caption}</caption>
             <thead>
               <tr>
                 {columns.map((col, index) => (
@@ -116,7 +101,6 @@ const TableInput = ({ tables, setTables }) => {
           <div key={tableIndex} className="mt-3">
             <h6>Table {tableIndex + 1}</h6>
             <table className="table table-bordered">
-              <caption>{table.caption}</caption>
               <thead>
                 <tr>
                   {table.columns.map((col, index) => (
